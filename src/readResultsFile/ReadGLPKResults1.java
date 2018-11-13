@@ -7,12 +7,14 @@ import java.io.IOException;
 public class ReadGLPKResults1 {
 
 	//ALTERAR O CAMINHO PARA O FOLDER QUE SE DESEJA TRABALHAR
-	private static final String PATHNAME = "D:\\MAScode\\TestDataJournal\\Test";
+	//private static final String PATHNAME = "D:\\MAScode\\TestDataJournal\\Test";
+	private static final String PATHNAME = "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\Test";
 	//private static final String PATHNAME = "D:\\MAScode\\TestDataJournal\\TestData2\\Test";
 	//private static final String PATHNAME = "D:\\MAScode\\TestDataJournal\\tkR60\\Test";
 	private static final String FILENAME = "\\tbGLPK.sol";
 	
-	static String mainFolder="D:\\MAScode\\TestDataJournal\\";
+	//static String mainFolder="D:\\MAScode\\TestDataJournal\\";
+	static String mainFolder = "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\";
 	//static String mainFolder="D:\\MAScode\\TestDataJournal\\TestData2\\";
 	//static String mainFolder="D:\\MAScode\\TestDataJournal\\tkR60\\";
 
@@ -26,7 +28,7 @@ public class ReadGLPKResults1 {
 		FileReader fr = null;
 
 	//MUDAR OS VALORES DE X PARA OUTROS NOMES DE FOLDERS QUE NÃO SEJAM DE 1 A 100	
-	for (int x=1;x<=50;x++){
+	for (int x=1;x<=3;x++){
 	
 		String finalFileName=PATHNAME+x+FILENAME;
 		try {

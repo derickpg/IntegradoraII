@@ -8,34 +8,42 @@ import java.util.Random;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 public class dataGenerator {
-	static String jacamoProjectFolder="D:\\MAScode\\taskAllocProcessTestNamespaceRealloc\\";
-	static String jacamoAslFolder="D:\\MAScode\\taskAllocProcessTestNamespaceRealloc\\src\\agt\\agTest\\";
-	//static String jacamoProjectFolder="D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\";
-	//static String jacamoAslFolder="D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\src\\agt\\agTest\\";
-	static String glpkFolder="C:\\GLPK\\winglpk-4.60\\glpk-4.60\\w64\\";
-	static String mainFolder="D:\\MAScode\\TestDataJournal\\";
+	//static String jacamoProjectFolder="D:\\MAScode\\taskAllocProcessTestNamespaceRealloc\\";
+	//static String jacamoAslFolder="D:\\MAScode\\taskAllocProcessTestNamespaceRealloc\\src\\agt\\agTest\\";
+	////static String jacamoProjectFolder="D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\";
+	////static String jacamoAslFolder="D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\src\\agt\\agTest\\";
+	//static String glpkFolder="C:\\GLPK\\winglpk-4.60\\glpk-4.60\\w64\\";
+	//static String mainFolder="D:\\MAScode\\TestDataJournal\\";
+	
+		//Variaveis Derick
+		
+	
+	static String jacamoProjectFolder= "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\";
+	static String jacamoAslFolder= "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\src\\agt\\agTest\\";
+	static String glpkFolder= "C:\\glpk-4.65\\w64\\";
+	static String mainFolder= "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\";
 
 	static String testFolder;
 	static String pathFolder;
-	static int nSimulacoes = 3;
+	static int nSimulacoes = 1;
 	static String jobId="job1";
 	
-	static int nAgents = 3;
-	static int limitAgents = 5; //tasks por agent
-	static int aijMax=6;
+	static int nAgents = 10;
+	static int limitAgents = 5; //tasks por agent 5
+	static int aijMax=1;//6
 	
 	//setar tasks e subtasks a gerar
-	static int ntasksCompL =1;
-	static int nsubTasksL=3;//maximo de subtasks de uma tarefa composta L
+	static int ntasksCompL = 1;
+	static int nsubTasksL= 5;//maximo de subtasks de uma tarefa composta L
 	static int ntasksCompN = 0;
 	static int nsubTasksN=0;//maximo de subtasks de uma tarefa composta N
 	static int ntasksCompS = 0;
 	static int nsubTasksS=0;//maximo de subtasks de uma tarefa composta N
 	
 	
-	static int nroles = 4;
-	static int ncapabilities=4;
-	static int ncapRole=3; //maximo de capacidades por role
+	static int nroles = 4; //4
+	static int ncapabilities= 4; //4
+	static int ncapRole=1; //maximo de capacidades por role //3
 
 	//forcar todas as capacidaes nos agentes?
 	static	boolean forceAgentCap=true;
@@ -49,7 +57,7 @@ public class dataGenerator {
 	static ArrayList<agent> agentsList = new ArrayList<agent>();
 	
 
-	static boolean subtasksFix = true; //true significa que eh exato x subtasks
+	static boolean subtasksFix = true; //true significa que eh exato x subtasks AQUI
 	static ArrayList<task> taskList = new ArrayList<task>();
 	static ArrayList<String> tasksCompN = new ArrayList<String>();
 	static ArrayList<String> tasksCompL = new ArrayList<String>();
@@ -107,7 +115,10 @@ public static void main(String[] args) {
 	//rfileJacamo.appendLine("timeout 5 > NUL");
 	rfileJacamo.appendLine("echo %time%");
 	rfileJacamo.appendLine("");
-	rfileJacamo.appendLine("\"C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java\" -classpath C:\\MASSource\\jacamo-0.7-SNAPSHOT\\libs\\ant-launcher-1.10.1.jar org.apache.tools.ant.launch.Launcher -e -f  D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\bin\\taskAllocProcess"+nAgents+".xml"); 
+	
+	//rfileJacamo.appendLine("\"C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java\" -classpath C:\\MASSource\\jacamo-0.7-SNAPSHOT\\libs\\ant-launcher-1.10.1.jar org.apache.tools.ant.launch.Launcher -e -f  D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\bin\\taskAllocProcess"+nAgents+".xml"); 
+	//Derick
+	rfileJacamo.appendLine("\"C:\\Program Files\\Java\\jdk1.8.0_171\\bin\\java\" -classpath C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\jacamo-0.7-SNAPSHOT\\libs\\ant-launcher-1.10.1.jar org.apache.tools.ant.launch.Launcher -e -f  C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\bin\\taskAllocProcess"+nAgents+".xml"); 	
 	rfileJacamo.appendLine("");
 	rfileJacamo.appendLine("copy "+jacamoProjectFolder+"ResultTestData.txt "+pathFolder);
 	rfileJacamo.appendLine("del "+jacamoProjectFolder+"ResultTestData.txt");
@@ -140,11 +151,21 @@ public static void main(String[] args) {
 	else
 		populateAgentCapabilitiesALL();
 	
-	populateTasks();
+	populateTasks(); // [Derick] Alterar e colocar as prioridades nas tasks
 	populateAgentRoles();
 	checkRolesAgents();
 	//checkRolesAgents();
 	populateAgentPayoffs();
+	
+	// [Derick] Para cada prioridade das tasks , mandar executar primeiro com todas as taks nivel1, depois nivel2....
+	//Basicamente vai pegar o arrayzão de task que ta pronto, e vai verificar quais tasks são de prioridade 1
+	// ai vai carregar um novo array para que esses métodos aqui de baixo gerem para cada PRIORIDADE uma execução do 
+	// alocador de tarefas!
+	// OBS tem que verificar se são só esses métodos que geram as execução ( a principio sim ) 
+	//Então vai ter um for de 1 até n ( sendo n o número de prioridades)
+	// executa cada processo desse aqui de baixo para cada laço do for
+	// e ai vai ter 1 arquivo para cada prioridade a ser rodado!
+	// Tem que colocar o nome das prioridades no arquivo, tipo execuçãoNivel1, execuçãoNivel2...
 	dataAgents_toFile();
 	dataAnnouncer_toFile();
 	dataPlanner_toFile();
@@ -815,7 +836,7 @@ public static void populateAgentPayoffs() {
 	}
 }
 
-
+// [Derick] Ver aqui como ele popula as tasks e colocar a prioridade nelas
 public static void populateTasks() {
 String task, subtask, taskType, roleDesc;
 int qdtSubT, roleN;
@@ -824,7 +845,7 @@ Random rn = new Random();
 taskType="tcn";
 	for (int tn=1;tn<=ntasksCompN;tn++){
 		task="tn"+tn;
-		tasksCompN.add(task);
+		tasksCompN.add(task);  //Ele adiciona aqui nesse array as tasks do tipo N! [Derick]
 		if (subtasksFix==false)
 		qdtSubT = rn.nextInt(nsubTasksN)+1;
 		else qdtSubT = nsubTasksN;
@@ -1274,7 +1295,7 @@ public static void dataGLPK_toFile() {
 		rfile.appendLine(";");
 		rfile.appendLine(" ");
 
-//AUX ARRAY
+//AUX ARRAY      <<<<<----- [Derick] AQUI que eu devo ver as tasks adicionadas em 1 array unico!
 		//adiciona todas as tasks em um unico array
 		ArrayList<String> tasksAll = new ArrayList<String>();
 		for (int tn=0;tn<ntasksCompN;tn++)

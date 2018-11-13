@@ -7,10 +7,11 @@ import java.io.IOException;
 public class ReadGLPKTimeResults1 {
 
 	//ALTERAR O CAMINHO PARA O FOLDER QUE SE DESEJA TRABALHAR
-	private static final String PATHNAME = "C:\\MAS_Contest\\Workspace_Eclipse_Luna2\\AAMAS_dataGenerator\\TestData2\\";
+	//private static final String PATHNAME = "C:\\MAS_Contest\\Workspace_Eclipse_Luna2\\AAMAS_dataGenerator\\TestData2\\";
+	private static final String PATHNAME = "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\Test";
 	private static final String FILENAME = "GLPKTimeResults.txt";
 	
-	static String mainFolder="C:\\MAS_Contest\\Workspace_Eclipse_Luna2\\AAMAS_dataGenerator\\TestData2\\";
+	static String mainFolder="C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\";
 
 	public static void main(String[] args) {
 
