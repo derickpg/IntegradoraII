@@ -3,13 +3,17 @@ package dataGen;
 public class task {
 
 	String subTask, task, taskType, role;
+        //Contribuição Derick sobre Prioridades
+        int prioridade;
 	
-	public task(String subTask, String task, String taskType, String role) {
+	public task(String subTask, String task, String taskType, String role, int prioridade) {
+        //public task(String subTask, String task, String taskType, String role) {
 		super();
 		this.subTask = subTask;
 		this.task = task;
 		this.taskType = taskType;
 		this.role = role;
+                this.prioridade = prioridade;
 	}
 
 	public String getSubTask() {
@@ -28,4 +32,8 @@ public class task {
 		return role;
 	}
 	
+        public int getPrioridade(){
+                return prioridade;
+        }
+        
 }

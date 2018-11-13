@@ -15,9 +15,7 @@ public class dataGenerator {
 	//static String glpkFolder="C:\\GLPK\\winglpk-4.60\\glpk-4.60\\w64\\";
 	//static String mainFolder="D:\\MAScode\\TestDataJournal\\";
 	
-		//Variaveis Derick
-		
-	
+		//Variaveis de Caminho Derick
 	static String jacamoProjectFolder= "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\";
 	static String jacamoAslFolder= "C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\src\\agt\\agTest\\";
 	static String glpkFolder= "C:\\glpk-4.65\\w64\\";
@@ -34,11 +32,11 @@ public class dataGenerator {
 	
 	//setar tasks e subtasks a gerar
 	static int ntasksCompL = 1;
-	static int nsubTasksL= 5;//maximo de subtasks de uma tarefa composta L
-	static int ntasksCompN = 0;
-	static int nsubTasksN=0;//maximo de subtasks de uma tarefa composta N
-	static int ntasksCompS = 0;
-	static int nsubTasksS=0;//maximo de subtasks de uma tarefa composta N
+	static int nsubTasksL= 2;//maximo de subtasks de uma tarefa composta L
+	static int ntasksCompN = 1;
+	static int nsubTasksN=3;//maximo de subtasks de uma tarefa composta N
+	static int ntasksCompS = 2;
+	static int nsubTasksS=3;//maximo de subtasks de uma tarefa composta N
 	
 	
 	static int nroles = 4; //4
@@ -71,6 +69,12 @@ public class dataGenerator {
 	static AppendToFile rfileGLPK;
 	
 	static int simulacaoAtual=0;
+        
+        
+        //Variaveis para as prioridades das tarefas 
+        static int nPrioridade = 3; //Quantidade de prioridades
+        static ArrayList<ArrayList<String>> mPrioridade = new ArrayList<ArrayList<String>>(); //Matriz de Prioridades
+        static ArrayList<ArrayList<task>> mTaskPrioridade = new ArrayList<ArrayList<task>>(); //Matriz de Prioridades para Tasks
 	
 public static void main(String[] args) {
 	//dataAgents(); //para cada agente e chama data para forï¿½a bruta - PRINT NA TELA
@@ -108,7 +112,7 @@ public static void main(String[] args) {
 	rfileJacamo.appendLine("del "+jacamoAslFolder+"*.asl");
 	rfileJacamo.appendLine("del "+jacamoAslFolder+"*.pddl");
 	rfileJacamo.appendLine("del "+jacamoAslFolder+"*.mod");
-	rfileJacamo.appendLine("copy "+pathFolder+"*.* "+jacamoAslFolder);
+	/**rfileJacamo.appendLine("copy "+pathFolder+"*.* "+jacamoAslFolder);
 	rfileJacamo.appendLine("");
 	//rfileJacamo.appendLine("@echo off");
 	//rfileJacamo.appendLine("echo %time%");
@@ -123,6 +127,7 @@ public static void main(String[] args) {
 	rfileJacamo.appendLine("copy "+jacamoProjectFolder+"ResultTestData.txt "+pathFolder);
 	rfileJacamo.appendLine("del "+jacamoProjectFolder+"ResultTestData.txt");
 	rfileJacamo.appendLine("");
+        
 	
 //	rfileGLPK.appendLine("del "+jacamoAslFolder+"*.asl");
 //	rfileGLPK.appendLine("del "+jacamoAslFolder+"*.pddl");
@@ -138,9 +143,11 @@ public static void main(String[] args) {
 	rfileGLPK.appendLine("");
 	rfileGLPK.appendLine("echo endTime %time%");
 	rfileGLPK.appendLine("");
+        * */
 /* end*************PARTE ARQUIVO EXEC	**************** */	
 
-	
+        criaListaPrioridades(); // Derick 
+
 	populateAgents();
 	populateRoles();
 	populateCapabilities();
@@ -157,27 +164,100 @@ public static void main(String[] args) {
 	//checkRolesAgents();
 	populateAgentPayoffs();
 	
-	// [Derick] Para cada prioridade das tasks , mandar executar primeiro com todas as taks nivel1, depois nivel2....
-	//Basicamente vai pegar o arrayzão de task que ta pronto, e vai verificar quais tasks são de prioridade 1
-	// ai vai carregar um novo array para que esses métodos aqui de baixo gerem para cada PRIORIDADE uma execução do 
-	// alocador de tarefas!
-	// OBS tem que verificar se são só esses métodos que geram as execução ( a principio sim ) 
-	//Então vai ter um for de 1 até n ( sendo n o número de prioridades)
-	// executa cada processo desse aqui de baixo para cada laço do for
-	// e ai vai ter 1 arquivo para cada prioridade a ser rodado!
-	// Tem que colocar o nome das prioridades no arquivo, tipo execuçãoNivel1, execuçãoNivel2...
-	dataAgents_toFile();
-	dataAnnouncer_toFile();
-	dataPlanner_toFile();
-	dataGLPK_toFile();
+        
+        //Armazena todos os paths olds caso precisem ser usados posteriormente.
+        String oldPathFolder = pathFolder; 
+        ArrayList<task> oldtaskList = taskList;
+	ArrayList<String> oldtasksCompN = tasksCompN;
+	ArrayList<String> oldtasksCompL = tasksCompL;
+	ArrayList<String> oldtasksCompS = tasksCompS;
+        int oldntasksCompN = ntasksCompN;
+        int oldntasksCompL = ntasksCompL;
+        int oldntasksCompS = ntasksCompS;
+        String oldmainFolder = mainFolder;
+
+        System.out.println("----------- Prioridade ---------------");
+            for (int i = 0; i < nPrioridade; i++) {
+                if((mTaskPrioridade.get(i).size() != 0)){ // Se tem alguma task neste prioridade faÃ§o o processo               
+                    //Processo que cria as pastas para cada prioridade
+                    rfile.createFolder(oldPathFolder + "\\Prioridade" + i);
+                    
+                    // Define o novo path para pasta que foi criada
+                    pathFolder = oldPathFolder + "Prioridade" + i + "\\";
+                    System.out.println("Prioridade " + i + " contÃ©m  " + mTaskPrioridade.get(i).size() + "  tarefas! e estÃ¡ no folder " + pathFolder);
+                    
+                    // Altera a pasta Main para a pasta da prioridade
+                    mainFolder = oldPathFolder + "Prioridade" + i + "\\";
+                    
+                    
+                    // Coloca na taskList todas as tasks da prioridade i
+                    taskList = mTaskPrioridade.get(i);
+                    // Coloca em cada tasnksComp as tasks da prioridade i
+                    for (int j = 0; j < 3; j++) { // J vai atÃ© 3 por que sÃ³ temos 3 arrays N,L,S
+                        tasksCompN = mPrioridade.get((i * 3));
+                        tasksCompL = mPrioridade.get(((i * 3) + 1));
+                        tasksCompS = mPrioridade.get(((i * 3) + 2));
+                    }
+                    //Muda a quantidade de tasks para cada quantidade de tasks da prioridade
+                    ntasksCompN = mPrioridade.get((i * 3)).size();
+                    ntasksCompL = mPrioridade.get(((i * 3) + 1)).size();
+                    ntasksCompS = mPrioridade.get(((i * 3) + 2)).size();
+                    //Executa todas as files
+                        dataAgents_toFile();
+                        dataAnnouncer_toFile();
+                        dataPlanner_toFile();
+                        dataGLPK_toFile();
+                        dataAnnouncer_toFile();
+                        
+                        
+                    // Criando o .bat do Jacamo para cada Prioridade    
+                    rfileJacamo.appendLine("copy "+pathFolder+"*.* "+jacamoAslFolder);
+                    rfileJacamo.appendLine("");
+                    //rfileJacamo.appendLine("@echo off");
+                    //rfileJacamo.appendLine("echo %time%");
+                    //rfileJacamo.appendLine("timeout 5 > NUL");
+                    rfileJacamo.appendLine("echo %time%");
+                    rfileJacamo.appendLine("");
+
+                    //rfileJacamo.appendLine("\"C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java\" -classpath C:\\MASSource\\jacamo-0.7-SNAPSHOT\\libs\\ant-launcher-1.10.1.jar org.apache.tools.ant.launch.Launcher -e -f  D:\\MAScode\\taskAllocProcessTestNamespaceReallocSSIA\\bin\\taskAllocProcess"+nAgents+".xml"); 
+                    rfileJacamo.appendLine("\"C:\\Program Files\\Java\\jdk1.8.0_171\\bin\\java\" -classpath C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\jacamo-0.7-SNAPSHOT\\libs\\ant-launcher-1.10.1.jar org.apache.tools.ant.launch.Launcher -e -f  C:\\Users\\garce\\Documents\\FaculdadeExtra\\Integradora\\Tentativa1New\\taskAllocProcessTestNamespaceAuction2017\\bin\\taskAllocProcess"+nAgents+".xml"); 	
+                    rfileJacamo.appendLine("");
+                    rfileJacamo.appendLine("copy "+jacamoProjectFolder+"ResultTestData.txt "+pathFolder);
+                    rfileJacamo.appendLine("del "+jacamoProjectFolder+"ResultTestData.txt");
+                    rfileJacamo.appendLine("");
+
+
+
+                    rfileJacamo.appendLine("copy "+jacamoProjectFolder+"JacamoResults.txt "+mainFolder);
+                    rfileJacamo.appendLine("del "+jacamoProjectFolder+"JacamoResults.txt");
+                    rfileJacamo.appendLine("");
+                    
+                    rfileGLPK.appendLine("");
+                    //rfileGLPK.appendLine("@echo off");
+                    //rfileGLPK.appendLine("echo %time%");
+                    //rfileGLPK.appendLine("timeout 5 > NUL");
+                    rfileGLPK.appendLine("echo startTime %time%");
+                    rfileGLPK.appendLine("");
+                    rfileGLPK.appendLine(glpkFolder+"glpsol"+ " --model "+pathFolder+"glpk"+nAgents+".mod --display "+pathFolder+"tbGLPK.out --wlp "+pathFolder+"tbGLPK.lp --output "+pathFolder+"tbGLPK.sol"); 
+                    rfileGLPK.appendLine("");
+                    rfileGLPK.appendLine("echo endTime %time%");
+                    rfileGLPK.appendLine("");
+                    
+                }
+            }
+            System.out.println("----------- Fim Prioridade ---------------");
+	//dataAgents_toFile();
+	//dataAnnouncer_toFile();
+	//dataPlanner_toFile();
+	//dataGLPK_toFile();
 	//dataAnnouncer_toFile();
 	
 System.out.println("end!!");
 	}
 	
-	rfileJacamo.appendLine("copy "+jacamoProjectFolder+"JacamoResults.txt "+mainFolder);
-	rfileJacamo.appendLine("del "+jacamoProjectFolder+"JacamoResults.txt");
-	rfileJacamo.appendLine("");
+	//rfileJacamo.appendLine("copy "+jacamoProjectFolder+"JacamoResults.txt "+mainFolder);
+	//rfileJacamo.appendLine("del "+jacamoProjectFolder+"JacamoResults.txt");
+	//rfileJacamo.appendLine("");
 
 	
 	rfile2.closeFile();
@@ -186,6 +266,17 @@ System.out.println("end!!");
 	//data
 }
 
+public static void criaListaPrioridades(){
+    //Realiza a criaÃ§Ã£o das listas dentro das matrizes
+    for (int i = 0; i < nPrioridade; i++) {
+        ArrayList<task> auxT = new ArrayList<task>();
+        mTaskPrioridade.add(i, auxT);
+    }
+    for (int i = 0; i < (nPrioridade * 3); i++) {
+        ArrayList<String> aux = new ArrayList<String>();
+        mPrioridade.add(i, aux);
+    }
+}
 
 public static void dataAgents_toFile() {
 	//rfile= new AppendToFile("TDx11_ForcaBrutaN20_T1.txt",false);
@@ -314,9 +405,6 @@ public static void dataAnnouncer_toFile() {
 	rfile.closeFile();
 
 }
-
-
-
 
 
 public static void populateAgents() {
@@ -841,11 +929,12 @@ public static void populateTasks() {
 String task, subtask, taskType, roleDesc;
 int qdtSubT, roleN;
 Random rn = new Random();
-
+int prioridade = 0; //Adionada a prioridade, contribuicao Derick
 taskType="tcn";
 	for (int tn=1;tn<=ntasksCompN;tn++){
 		task="tn"+tn;
-		tasksCompN.add(task);  //Ele adiciona aqui nesse array as tasks do tipo N! [Derick]
+		tasksCompN.add(task);
+                mPrioridade.get((prioridade * 3)).add(task); // Adiciona dentro da matriz de Prioridades a task na prioridade dela
 		if (subtasksFix==false)
 		qdtSubT = rn.nextInt(nsubTasksN)+1;
 		else qdtSubT = nsubTasksN;
@@ -853,11 +942,15 @@ taskType="tcn";
 		if (qdtSubT==0) {
 			qdtSubT=2;
 		}
+                //Define a prioridade de task
+                prioridade = rn.nextInt(nPrioridade);
 		for (int st=1;st<=qdtSubT;st++){
 			subtask=task+"st"+st;
 			roleN = rn.nextInt(ncapabilities);
 			roleDesc=roles.get(roleN);
-			taskList.add(new task(subtask,task,taskType,roleDesc));
+                        task taskNova = new task(subtask,task,taskType,roleDesc,prioridade);
+			taskList.add(taskNova); //Adiciona a task na lista de tasks com a prioridade
+                        mTaskPrioridade.get(prioridade).add(taskNova); //Adiciona na matriz de prioridades de task a nova task criada
 	}
 	}	
 
@@ -865,6 +958,7 @@ taskType="tcl";
 	for (int tl=1;tl<=ntasksCompL;tl++){
 		task="tl"+tl;
 		tasksCompL.add(task);
+                mPrioridade.get(((prioridade * 3) + 1)).add(task); // Adiciona dentro da matriz de Prioridades a task na prioridade dela
 		if (subtasksFix==false)
 			qdtSubT = rn.nextInt(nsubTasksL)+1;
 		else qdtSubT = nsubTasksL;
@@ -872,18 +966,24 @@ taskType="tcl";
 		if (qdtSubT==0) {
 			qdtSubT=2;
 		}
+                //Define a prioridade de task
+                prioridade = rn.nextInt(nPrioridade);
 		for (int st2=1;st2<=qdtSubT;st2++){
 			subtask=task+"st"+st2;
 			roleN = rn.nextInt(ncapabilities);
 			roleDesc=roles.get(roleN);
-			taskList.add(new task(subtask,task,taskType,roleDesc));
+                        task taskNova = new task(subtask,task,taskType,roleDesc,prioridade);
+			taskList.add(taskNova); //Adiciona a task na lista de tasks com a prioridade
+                        mTaskPrioridade.get(prioridade).add(taskNova); //Adiciona na matriz de prioridades de task a nova task criada
+                        
 	}
-	}
+        }
 
 taskType="sd";
 	for (int sd=1;sd<=ntasksCompS;sd++){
 		task="sd"+sd;
 		tasksCompS.add(task);
+                mPrioridade.get(((prioridade * 3) + 2)).add(task); // Adiciona dentro da matriz de Prioridades a task na prioridade dela
 		if (subtasksFix==false)
 			qdtSubT = rn.nextInt(nsubTasksS)+1;
 		else qdtSubT = nsubTasksS;
@@ -891,11 +991,15 @@ taskType="sd";
 		if (qdtSubT==0) {
 			qdtSubT=2;
 		}
+                //Define a prioridade de task
+                prioridade = rn.nextInt(nPrioridade);
 		for (int st3=1;st3<=qdtSubT;st3++){
 			subtask=task+"st"+st3;
 			roleN = rn.nextInt(ncapabilities);
 			roleDesc=roles.get(roleN);
-			taskList.add(new task(subtask,task,taskType,roleDesc));
+                        task taskNova = new task(subtask,task,taskType,roleDesc,prioridade);
+			taskList.add(taskNova); //Adiciona a task na lista de tasks com a prioridade
+                        mTaskPrioridade.get(prioridade).add(taskNova); //Adiciona na matriz de prioridades de task a nova task criada
 	}
 	}	
 	
@@ -1200,7 +1304,7 @@ public static void dataGLPK_toFile() {
 	rfile.appendLine("   C5{j in TASKS, i in ROBOTS}: sum{k in SUBTASKS} f[i,k]*P[j,k] >= Lmin[j];");
 	rfile.appendLine("   C6{j in TASKS, i in ROBOTS}: sum{k in SUBTASKS} f[i,k]*P[j,k] <= Lmax[j];");
 	rfile.appendLine("");
-	rfile.appendLine("# se precisar, card(X) é |X|");
+	rfile.appendLine("# se precisar, card(X) ï¿½ |X|");
 	rfile.appendLine("");
 	rfile.appendLine("solve;");
 	rfile.appendLine("");
@@ -1481,7 +1585,7 @@ public static void dataGLPK_toFile() {
 								payoff=payoff+agentX2.getPayoffAijGLPK(taskX2.getSubTask());
 								//payoff=payoff+agentX2.getPayoffAijPlanner(taskX2.getSubTask());
 								
-								//System.out.println("payoff da subtask:"+taskX2.getSubTask()+" é:"+agentX2.getPayoffAijPlanner(taskX2.getSubTask()));
+								//System.out.println("payoff da subtask:"+taskX2.getSubTask()+" ï¿½:"+agentX2.getPayoffAijPlanner(taskX2.getSubTask()));
 							}
 						}
 						robotPayoff=robotPayoff+payoff+" ";

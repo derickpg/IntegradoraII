@@ -18,6 +18,7 @@ public class ReadGLPKResults1 {
 	//static String mainFolder="D:\\MAScode\\TestDataJournal\\TestData2\\";
 	//static String mainFolder="D:\\MAScode\\TestDataJournal\\tkR60\\";
 
+       private static final int nPrioridade = 0; // Definir qual prioridade será avaliada
 	public static void main(String[] args) {
 
 		System.out.println("Starting..");
@@ -27,10 +28,10 @@ public class ReadGLPKResults1 {
 		BufferedReader br = null;
 		FileReader fr = null;
 
-	//MUDAR OS VALORES DE X PARA OUTROS NOMES DE FOLDERS QUE N�O SEJAM DE 1 A 100	
-	for (int x=1;x<=3;x++){
+	//MUDAR OS VALORES DE X PARA OUTROS NOMES DE FOLDERS QUE N�O SEJAM DE 1 A 100	
+	for (int x=1;x<=1;x++){
 	
-		String finalFileName=PATHNAME+x+FILENAME;
+		String finalFileName=PATHNAME+x+"\\prioridade"+ nPrioridade +"\\"+FILENAME; // Definir o número de prioridades conforme está no dataGenerator
 		try {
 			fr = new FileReader(finalFileName);
 			br = new BufferedReader(fr);
